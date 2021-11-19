@@ -5,7 +5,7 @@ use crate::api::egl::{
 };
 use crate::api::glx::{Context as GlxContext, GLX};
 use crate::platform::unix::x11::XConnection;
-use crate::platform::unix::{EventLoopWindowTargetExtUnix, WindowBuilderExtUnix, WindowExtUnix};
+use crate::platform::unix::{WindowBuilderExtUnix, WindowExtUnix, XVisualInfos};
 use crate::platform_impl::x11_utils;
 use crate::{
     Api, ContextError, CreationError, GlAttributes, GlRequest, PixelFormat,
@@ -190,7 +190,7 @@ impl Context {
         size: Option<dpi::PhysicalSize<u32>>,
         fallback: bool,
     ) -> Result<Self, CreationError> {
-        let xconn = match el.xlib_xconnection() {
+        let xconn = match unsafe { XConnection::from_event_loop(el) } {
             Some(xconn) => xconn,
             None => {
                 return Err(CreationError::NoBackendAvailable(Box::new(NoX11Connection)));
@@ -434,7 +434,7 @@ impl Context {
         gl_attr: &GlAttributes<&Context>,
         fallback: bool,
     ) -> Result<(Window, Self), CreationError> {
-        let xconn = match el.xlib_xconnection() {
+        let xconn = match unsafe { XConnection::from_event_loop(el) } {
             Some(xconn) => xconn,
             None => {
                 return Err(CreationError::NoBackendAvailable(Box::new(NoX11Connection)));
@@ -470,13 +470,17 @@ impl Context {
             }
         };
 
-        let win =
-            wb.with_x11_visual(&visual_infos as *const _).with_x11_screen(screen_id).build(el)?;
+        let visual_infos = XVisualInfos {
+            visual_id: Some(visual_infos.visualid as _),
+            depth: Some(visual_infos.depth as _),
+        };
 
-        let xwin = win.xlib_window().unwrap();
+        let win = wb.with_x11_visual(visual_infos).with_x11_screen(screen_id as u32).build(el)?;
+
+        let xwin = win.x11_window().unwrap();
         // finish creating the OpenGL context
         let context = match context {
-            Prototype::Glx(ctx) => X11Context::Glx(ctx.finish(xwin)?),
+            Prototype::Glx(ctx) => X11Context::Glx(ctx.finish(xwin as _)?),
             Prototype::Egl(ctx) => X11Context::Egl(ctx.finish(xwin as _)?),
         };
 

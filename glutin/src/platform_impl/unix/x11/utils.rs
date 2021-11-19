@@ -17,8 +17,7 @@ pub fn get_visual_info_from_xid(xconn: &Arc<XConnection>, xid: ffi::VisualID) ->
             &mut num_visuals,
         )
     };
-    xconn.check_errors().expect("Failed to call `XGetVisualInfo`");
-    assert!(!vi.is_null());
+    assert!(!vi.is_null(), "Failed to call `XGetVisualInfo`");
     assert!(num_visuals == 1);
 
     let vi_copy = unsafe { std::ptr::read(vi as *const _) };

@@ -41,8 +41,7 @@ impl MakeCurrentGuard {
             let res = glx.MakeCurrent(xconn.display as *mut _, drawable, context);
 
             if res == 0 {
-                let err = xconn.check_errors();
-                Err(format!("`glXMakeCurrent` failed: {:?}", err))
+                Err(format!("`glXMakeCurrent` failed"))
             } else {
                 Ok(ret)
             }
@@ -74,8 +73,7 @@ impl Drop for MakeCurrentGuard {
         let res = unsafe { glx.MakeCurrent(display as *mut _, drawable, context) };
 
         if res == 0 {
-            let err = self.xconn.check_errors();
-            panic!("`glXMakeCurrent` failed: {:?}", err);
+            panic!("`glXMakeCurrent` failed");
         }
     }
 }

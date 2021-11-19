@@ -124,8 +124,7 @@ impl Context {
 
     unsafe fn check_make_current(&self, ret: Option<i32>) -> Result<(), ContextError> {
         if ret == Some(0) {
-            let err = self.xconn.check_errors();
-            Err(ContextError::OsError(format!("`glXMakeCurrent` failed: {:?}", err)))
+            Err(ContextError::OsError(format!("`glXMakeCurrent` failed")))
         } else {
             Ok(())
         }
@@ -179,11 +178,7 @@ impl Context {
         unsafe {
             glx.SwapBuffers(self.xconn.display as *mut _, self.drawable);
         }
-        if let Err(err) = self.xconn.check_errors() {
-            Err(ContextError::OsError(format!("`glXSwapBuffers` failed: {:?}", err)))
-        } else {
-            Ok(())
-        }
+        Ok(())
     }
 
     #[inline]

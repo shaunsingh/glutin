@@ -13,6 +13,7 @@ mod this_example {
     use super::support;
     use glutin::event::{Event, WindowEvent};
     use glutin::event_loop::{ControlFlow, EventLoop};
+    use glutin::platform::unix::x11::XConnection;
     use glutin::window::WindowBuilder;
     use glutin::ContextBuilder;
     use std::io::Write;
@@ -77,10 +78,10 @@ File a PR if you are interested in implementing the latter.
                     }
 
                     let win = wb.build(&el).unwrap();
-                    let xconn = el.xlib_xconnection().unwrap();
-                    let xwindow = win.xlib_window().unwrap();
+                    let xconn = XConnection::from_event_loop(&el).unwrap();
+                    let xwindow = win.x11_window().unwrap();
                     let raw_context =
-                        ContextBuilder::new().build_raw_x11_context(xconn, xwindow).unwrap();
+                        ContextBuilder::new().build_raw_x11_context(xconn, xwindow as _).unwrap();
 
                     (raw_context, el)
                 }
