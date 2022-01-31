@@ -21,7 +21,7 @@ default = ["x11", "wayland"]
 
 [dependencies]
 lazy_static = "1.3"
-winit = { git = "https://github.com/mahkoh/winit", rev = "6f91c74bcb115eaa5a49882d8d6e4c8be2bfa8de", default-features = false  }
+winit = { git = "https://github.com/neovide/winit", branch = "neovide-x11-nt", default-features = false  }
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_glue = "0.2"
