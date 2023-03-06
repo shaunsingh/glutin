@@ -51,7 +51,7 @@ impl Context {
         pf_reqs: &PixelFormatRequirements,
         gl_attr: &GlAttributes<&Context>,
     ) -> Result<(Window, Self), CreationError> {
-        let transparent = wb.window.transparent;
+        // let transparent = wb.window.transparent;
         let win = wb.build(el)?;
 
         let share_ctx = gl_attr.sharing.map_or(nil, |c| *c.get_id());
@@ -125,6 +125,7 @@ impl Context {
                 appkit::NSOpenGLContextParameter::NSOpenGLCPSwapInterval,
             );
 
+            /*
             if transparent {
                 let mut opacity = 0;
                 CGLSetParameter(
@@ -133,6 +134,7 @@ impl Context {
                     &mut opacity,
                 );
             }
+            */
 
             CGLEnable(gl_context.CGLContextObj() as *mut _, kCGLCECrashOnRemovedFunctions);
 
